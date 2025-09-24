@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego de Contraseñas - Versión 2.0</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      background: radial-gradient(circle at top, #0d0d0d, #1a1a1a 80%);
+      color: #eee;
+      padding: 30px;
+    }
+    h1 {
+      color: #00ff99;
+      text-shadow: 0 0 8px #00ff99;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.1em;
+      color: #ccc;
+    }
+    .container {
+      display:flex; justify-content: space-around; margin-top: 30px; flex-wrap:wrap; gap:20px;
+    }
+    .dropzone {
+      border: 2px dashed #00bfff;
+      border-radius: 12px;
+      width: 340px;
+      min-height: 220px;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+    .dropzone:hover {
+      box-shadow: 0 0 15px #00bfff;
+    }
+    .dropzone h2 { color: #00bfff; margin:0 0 8px 0; }
+    .draggable {
+      background: #111;
+      color: #fff;
+      padding: 10px 14px;
+      margin: 8px;
+      border-radius: 6px;
+      cursor: grab;
+      display:inline-block;
+      border: 1px solid #00ffcc;
+      text-shadow: 0 0 5px #00ffcc;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .draggable:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 10px #00ffcc;
+    }
+    #contraseñas {
+      margin-top:25px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    }
+    button {
+      margin-top:20px; padding:12px 20px; border-radius:6px; border:0;
+      background:#00ff99; color:black; font-weight:bold; cursor:pointer;
+      box-shadow: 0 0 10px #00ff99; transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ff99;
+    }
+    #resultado {
+      margin-top:25px; font-size:18px; font-weight:bold; display:none;
+      padding:14px; border-radius:8px; animation: fadeIn 0.6s ease;
+    }
+    .green { background:#002b1c; color:#00ffcc; border:1px solid #00ffcc; }
+    .red { background:#2b0000; color:#ff6666; border:1px solid #ff6666; }
+    @media (max-width:700px){ .container{flex-direction:column;align-items:center;} .dropzone{width:90%} }
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    .confetti {
+      position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;
+    }
+    .confetti-piece {
+      width: 10px; height: 10px; background: #00ff99; position: absolute; animation: fall 3s linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(720deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>💻 Clasifica las contraseñas</h1>
+  <p>Arrastra las contraseñas a la categoría correcta: <strong>Seguras</strong> o <strong>Inseguras</strong>.</p>
+  <div class="container">
+    <div id="seguras" class="dropzone" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>Seguras</h2>
+    </div>
+    <div id="inseguras" class="dropzone" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>Inseguras</h2>
+    </div>
+  </div>
+
+  <div id="contraseñas" aria-live="polite">
+    <div id="c1" class="draggable" draggable="true" ondragstart="drag(event)">123456</div>
+    <div id="c2" class="draggable" draggable="true" ondragstart="drag(event)">S3gur@Clave!</div>
+    <div id="c3" class="draggable" draggable="true" ondragstart="drag(event)">contraseña</div>
+    <div id="c4" class="draggable" draggable="true" ondragstart="drag(event)">M1cr0$0ft2025</div>
+    <div id="c5" class="draggable" draggable="true" ondragstart="drag(event)">admin</div>
+    <div id="c6" class="draggable" draggable="true" ondragstart="drag(event)">QwErTy#2024</div>
+    <div id="c7" class="draggable" draggable="true" ondragstart="drag(event)">password123</div>
+    <div id="c8" class="draggable" draggable="true" ondragstart="drag(event)">C0ntr@S3gura!</div>
+    <div id="c9" class="draggable" draggable="true" ondragstart="drag(event)">abc123</div>
+    <div id="c10" class="draggable" draggable="true" ondragstart="drag(event)">#Cloud2025*</div>
+    <div id="c11" class="draggable" draggable="true" ondragstart="drag(event)">letmein</div>
+    <div id="c12" class="draggable" draggable="true" ondragstart="drag(event)">XyZ$9kLmN</div>
+  </div>
+
+  <button onclick="verificar()">Verificar</button>
+  <div id="resultado"></div>
+
+  <div id="confetti-container" class="confetti"></div>
+
+<script>
+  function allowDrop(ev) { ev.preventDefault(); }
+  function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+  function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    var node = document.getElementById(data);
+    var target = ev.target;
+    while(target && !target.classList.contains('dropzone')) target = target.parentElement;
+    if(target) target.appendChild(node);
+  }
+
+  function verificar() {
+    const correctSecure = ["c2","c4","c6","c8","c10","c12"];
+    const correctInsecure = ["c1","c3","c5","c7","c9","c11"];
+    let seguras = Array.from(document.getElementById('seguras').querySelectorAll('.draggable')).map(n=>n.id);
+    let inseguras = Array.from(document.getElementById('inseguras').querySelectorAll('.draggable')).map(n=>n.id);
+
+    const remaining = Array.from(document.querySelectorAll('#contraseñas .draggable'));
+    if(remaining.length>0) {
+      showResult(false, '❌ Mueve todas las contraseñas a una zona antes de verificar.');
+      return;
+    }
+
+    seguras.sort(); inseguras.sort(); correctSecure.sort(); correctInsecure.sort();
+    const ok = JSON.stringify(seguras)===JSON.stringify(correctSecure) && JSON.stringify(inseguras)===JSON.stringify(correctInsecure);
+    if(ok) {
+      showResult(true, `🎉 ¡Correcto!<br/>Tu próxima pista es:<br/><br/>"Donde las decisiones se firman y los papeles mandan: Área administrativa."<br/><br/>Fragmento de la contraseña final: <b>S3N4M0</b>`);
+      launchConfetti();
+    } else {
+      showResult(false, '❌ Alguna contraseña está mal clasificada. Intenta de nuevo.');
+    }
+  }
+
+  function showResult(ok, text) {
+    const el = document.getElementById('resultado');
+    el.style.display = 'block';
+    el.className = ok ? 'green' : 'red';
+    el.innerHTML = text;
+  }
+
+  function launchConfetti() {
+    const container = document.getElementById('confetti-container');
+    container.innerHTML = '';
+    for(let i=0;i<50;i++){
+      const piece = document.createElement('div');
+      piece.classList.add('confetti-piece');
+      piece.style.left = Math.random()*100 + 'vw';
+      piece.style.background = ['#00ff99','#00bfff','#ff66cc','#ffff66'][Math.floor(Math.random()*4)];
+      piece.style.animationDuration = (2+Math.random()*3) + 's';
+      piece.style.opacity = Math.random();
+      container.appendChild(piece);
+    }
+    setTimeout(()=>container.innerHTML='', 4000);
+  }
+</script>
+</body>
+</html>
